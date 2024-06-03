@@ -1,0 +1,176 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   readline_test.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/05/18 08:09:45 by gebuqaj           #+#    #+#             */
+/*   Updated: 2024/06/03 22:14:57 by marvin           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minishell.h"
+
+
+/*
+-n'execute pas nos propres executables (./a.out :command not found: a.out)
+
+*/
+
+int	main(void)
+{
+	char		*prompt = "\033[1;31m$> \033[0m";
+	char		*input;
+	pid_t		pid;
+	int			status;
+
+	while (1)
+	{
+		input = readline(prompt);//retourne NULL si EOF (ctrl-d)
+		if (input == NULL)
+		{
+			printf("exit\n");
+			break ;
+		}
+		if (is_builtin(input))
+			exec_builtin(input);
+		else
+		{
+			pid = fork();
+			if (pid == 0)
+			{
+				execute_external_command(input);
+				break ;
+			}
+			wait(&status);
+		}
+		if (*input)
+			add_history(input);
+		rl_on_new_line();
+		free(input);
+	}
+	return (0);
+}
+/*
+readline returns the text of the line read.  A blank line returns
+       the empty string.  If EOF is encountered while reading a line,
+       and the line is empty, NULL is returned.  If an EOF is read with
+       a non-empty line, it is treated as a newline.
+	   (EOF = Ctrl-D...)
+
+
+Lorsque fork() est appelée, le système d'exploitation crée un nouveau processus en dupliquant le processus appelant.
+Le processus enfant obtient une copie de l'espace mémoire du processus parent, y compris les variables, les descripteurs de fichiers, etc.
+Dans le processus parent, fork() retourne l'id du processus enfant.
+Dans l'enfant, fork() retourne 0.
+
+Lorsque wait() est appelée, le processus parent est suspendu jusqu'à ce qu'un de ses processus enfants se termine.
+wait() permet également au parent de récupérer le statut de terminaison de l'enfant.
+wait() retourne le PID du processus enfant qui s'est terminé.
+
+
+
+BASH ?
+selon les articles 'An overview how the BASH shell works' et 'How A Shell Works
+— What happens when ls -l is typed?' sur medium.com
+Le Shell
+1) affiche un prompt et attend une commande de l'utilisateur
+2) détermine combien il y a de 'tokens'. 
+3) contrôle la syntaxe de chaque token. S'il y a une erreur, aucune commande
+	ne sera interprétée et un message d'erreur sera affiché
+4) remplace les alias
+5) remplace les fonctions de shell (?); "Shell functions are a way to group
+	commands for later execution using a single name for the group. They are
+	executed just like a "regular" command."
+6) utilise les wildcards (bonus minishell)
+
+7) check si le premier token est une commande built-in ou externe. Les builtins
+	sont des commandes codés dans le shell lui-même. Si c'est externe, le shell
+	doit passer par le chemin de recherche $PATH. La variable $PATH est une
+	variable d'envrionnement et une liste de répertoires (délimités par ':')
+	dans lesquels le shell recherche les exécutables. Le shell combine la
+	commande entrée avec chaque répertoire. Par ex, pour le premier rép. de PATH
+	'/usr/local/bin', le shell crée(?) '/usr/local/bin/ls'. Ensuite, le shell
+	met cette string dans la fonction access() ou stat(), qui retourne 0 si le
+	fichier existe ou -1 s'il n'existe pas. Ensuite, le shell check si le fichier
+	est un exécutable en utilisant access() avec 2e argument X_OK. Si le fichier
+	n'existe pas ou n'est pas un exécutable, il check le rép. suivant de PATH.
+
+8) "À ce stade, il met en place la redirection, y compris les pipes."
+
+9) Dès qu'un exécutable est trouvée, le shell part en exécution; il utilise
+	fork() pour créer un processus enfant, qui exécutera la commande. Deux
+	processus sont en concurrence, exécutent des lignes de codes différentes
+	selon leur PID. Le processus parent attend avec wait() que l'enfant se
+	termine pour continuer à s'exécuter. L'enfant avec execve() exécute le fichier
+	entré en argument. La fonction execve() termine le programme, donc le process
+	enfant. Après avoir exécuté une commande, le shell exécute toutes les
+	commandes d'arrêt qui y sont programmées, libère toute mémoire allouée de ses
+	opérations et réaffiche un prompt.
+
+Si le programme qui doit être exécuté est un script shell, le programme
+	créé avec fork() et exec() est un autre shell. Ce nouveau shell commence à
+	lire le script shell et l'interprète, une ligne à la fois.
+
+
+Quoting:
+La citation est utilisée pour supprimer la signification spéciale de certains
+caractères ou mots dans la coquille. Les guillemets peuvent être utilisés pour
+préserver le sens littéral des caractères spéciaux dans le paragraphe suivant,
+empêcher les mots réservés d'être reconnus comme tels et empêcher l'expansion
+des paramètres et la substitution de commandes dans le traitement du document.
+
+The application shall quote the following characters if they are to represent
+themselves:
+|  &  ;  <  >  (  )  $  `  \  "  '  <space>  <tab>  <newline>
+
+and the following may need to be quoted under certain circumstances. That is,
+these characters may be special depending on conditions described elsewhere in
+this volume of IEEE Std 1003.1-2001:
+*   ?   [   #   ˜   =   %
+
+The various quoting mechanisms are the escape character, single-quotes, and
+double-quotes.
+
+single-quote, double-quote....
+
+
+Tokenisation bash? (chatgpt)
+(Ce qui n'est pas demandé dans le sujet n'est pas noté)
+
+-Un token est un élément entre délimiteurs(espace, tabulation ou nouvelle ligne).
+Par exemple, 'echo -n hola', 'echo' est un token, '-n' est token, 'hola' est un
+token. Les tokens sont contenus dans un tableau de strings.
+-Les guillemets doubles (") et simples (') sont utilisés pour inclure des
+espaces dans les tokens. Les guillemets simples préservent la littéralité de
+tout ce qui est à l'intérieur, tandis que les guillemets doubles permettent
+encore l'expansion des variables et des commandes. Par exemple, echo "Hello
+World" traite Hello World comme un seul token.
+-Expansion des variables et des commandes : Handle environment variables
+($ followed by a sequence of characters) which should expand to their values.
+
+
+1. Lecture
+2. Expansions ($USER devient gentian)
+3. La ligne de commande est décomposée en tokens en utilisant les espaces,
+les tabulations et les nouvelles lignes comme délimiteurs. Les guillemets
+(simples ' ou doubles ") jouent un rôle primordial.
+4.1. Guillemets simples (') : Tout ce qui se trouve à l'intérieur est pris
+littéralement. Aucun caractère spécial n'est interprété.
+4.2. Guillemets doubles (") : Certains caractères spéciaux comme $, conservent
+leur signification spéciale.
+echo "Hello $USER"  # Imprime 'Hello username' où 'username' est la valeur de
+la variable $USER
+5. Le shell reconnaît certains opérateurs et mots réservés qui ont une
+signification particulière, comme | (pipe). Ces opérateurs peuvent influencer
+la manière dont les tokens sont groupés et exécutés.
+6. Après la tokenisation, le shell effectue une analyse syntaxique pour
+comprendre la structure de la commande. Il identifie les commandes, les
+arguments, les redirections, les sous-commandes, etc.
+
+
+
+
+
+*/
