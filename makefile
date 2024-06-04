@@ -6,7 +6,6 @@ FLAGS =		-Wall -Werror -Wextra
 
 SRC = 		readline_test.c exec_ext.c builtins.c
 
-
 OBJ = ${SRC:.c=.o}
 
 %.o: %.c

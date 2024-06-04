@@ -12,9 +12,14 @@
 
 #include "minishell.h"
 
+/*l'input ne comprend pas le mot 'echo'. Exemple: input = "-n ceci stp" ou
+"ceci stp".*/
 void	ft_echo(char *input)
 {
-	printf("%s\n", input);
+	if (!ft_strncmp(input, "-n ", 3))
+		printf("(builtin)%s", input + 3);
+	else
+		printf("(builtin)%s\n", input);
 }
 
 void	ft_cd(char *input)
@@ -24,7 +29,13 @@ void	ft_cd(char *input)
 
 void	ft_pwd(char *input)
 {
-	printf("%s TO CODE\n", input);
+	char	cwd[PATH_MAX];
+
+	(void) input;
+    if (getcwd(cwd, sizeof(cwd)) != NULL)
+        printf("(builtin)%s\n", cwd);
+	else
+        printf("getcwd() error");
 }
 
 void	ft_export(char *input)
@@ -73,7 +84,7 @@ bool	is_builtin(char *input)
 	i = 0;
 	while (i <= 6)
 	{
-		if (!ft_strcmp(blts[i], input))
+		if (!ft_strncmp(blts[i], input, ft_strlen(blts[i])))
 			return (true);
 		i++;
 	}

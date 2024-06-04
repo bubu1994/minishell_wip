@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   execution.c                                        :+:      :+:    :+:   */
+/*   exec_ext.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 11:14:08 by gebuqaj           #+#    #+#             */
-/*   Updated: 2024/06/03 17:28:55 by marvin           ###   ########.fr       */
+/*   Updated: 2024/06/04 21:18:47 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,8 @@ char	*join_path_slash_input(char *path_rep, char *input)
 
 /*
 -input peut comprendre les options (ex. input = ls -l -a)
--ne peut pas prendre des guillemets (ft_super_split)
--si commande executée, leaks ??
--execute aussi les commandes built-ins (donc 2 fois si builtin codé)
+-n'interpréte pas les guillemets
+-si commande executée, leaks ?? La pile et le tas seraient écrasés
 -
 */
 void	execute_external_command(const char *input)
