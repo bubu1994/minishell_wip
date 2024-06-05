@@ -61,32 +61,37 @@ void	ft_exit(char *input)
 void	exec_builtin(char *input)
 {
 	if (!ft_strncmp(input, "echo", 4))
-		ft_echo(input + 5);
+		ft_echo(input + 5);//ce qui vient après 'echo ' est envoyé
 	else if (!ft_strncmp(input, "cd", 2))
 		ft_cd(input);
-	else if (!ft_strncmp(input, "pwd", 2))
+	else if (!ft_strncmp(input, "pwd", 3))
 		ft_pwd(input);
-	else if (!ft_strncmp(input, "export", 2))
+	else if (!ft_strncmp(input, "export", 6))
 		ft_export(input);
-	else if (!ft_strncmp(input, "unset", 2))
+	else if (!ft_strncmp(input, "unset", 5))
 		ft_unset(input);
-	else if (!ft_strncmp(input, "env", 2))
+	else if (!ft_strncmp(input, "env", 3))
 		ft_env(input);
-	else if (!ft_strncmp(input, "exit", 2))
+	else if (!ft_strncmp(input, "exit", 4))
 		ft_exit(input);
+	else
+		printf("error, builtin not executed\n");
 }
 
 bool	is_builtin(char *input)
 {
 	char	*blts[] = {"echo", "cd", "pwd", "export", "unset", "env", "exit"};
+	char	**tab_input;
 	int		i;
 
+	tab_input = ft_split(input, ' ');
 	i = 0;
 	while (i <= 6)
 	{
-		if (!ft_strncmp(blts[i], input, ft_strlen(blts[i])))
+		if (!ft_strcmp(blts[i], tab_input[0]))
 			return (true);
 		i++;
 	}
+	free_tab(tab_input);
 	return (false);
 }

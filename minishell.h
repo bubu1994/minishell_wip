@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: gebuqaj <gebuqaj@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/18 08:17:27 by gebuqaj           #+#    #+#             */
-/*   Updated: 2024/06/03 22:16:30 by marvin           ###   ########.fr       */
+/*   Updated: 2024/06/05 10:20:29 by gebuqaj          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,12 @@
 //builtins
 bool	is_builtin(char *input);
 void	exec_builtin(char *input);
-
 void	ft_echo(char *input);
 
 //exec_ext
 void	execute_external_command(const char *input);
+
+//utils
+void	free_tab(char **tab);
 
 #endif

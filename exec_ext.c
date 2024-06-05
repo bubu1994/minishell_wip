@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_ext.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: gebuqaj <gebuqaj@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 11:14:08 by gebuqaj           #+#    #+#             */
-/*   Updated: 2024/06/04 21:18:47 by marvin           ###   ########.fr       */
+/*   Updated: 2024/06/05 10:56:13 by gebuqaj          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ char	*join_path_slash_input(char *path_rep, char *input)
 -input peut comprendre les options (ex. input = ls -l -a)
 -n'interpréte pas les guillemets
 -si commande executée, leaks ?? La pile et le tas seraient écrasés
--
+-segfault avec des espaces au debut
 */
 void	execute_external_command(const char *input)
 {
@@ -47,8 +47,8 @@ void	execute_external_command(const char *input)
 	char	*path_to_exec;
 	int		i;
 
-	if (*input == '\0')
-		return  ;
+	if (input[0] == '\0')
+		return ;
 	input_tab = ft_split(input, ' ');
 	path_tab = ft_split(getenv("PATH"), ':');
 	i = -1;
