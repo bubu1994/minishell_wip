@@ -12,70 +12,101 @@
 
 #include "minishell.h"
 
-/*l'input ne comprend pas le mot 'echo'. Exemple: input = "-n ceci stp" ou
-"ceci stp".*/
-void	ft_echo(char *input)
+//Ex: "   echo -n   ceci et cela", splitté par les espaces
+void	ft_echo(char **input)
 {
-	if (!ft_strncmp(input, "-n ", 3))
-		printf("(builtin)%s", input + 3);
+	int	i;
+
+	if (!input[1])
+		return ;
+	if (!ft_strcmp(input[1], "-n"))
+	{
+		i = 2;
+		while (input[i])
+		{
+			printf("%s", input[i]);
+			if (i != size_of_tab(input) - 1)
+				printf(" ");
+			i++;
+		}
+	}
 	else
-		printf("(builtin)%s\n", input);
+	{
+		i = 1;
+		while (input[i])
+		{
+			printf("%s", input[i]);
+			if (i != size_of_tab(input) - 1)
+				printf(" ");
+			else
+				printf("\n");
+			i++;
+		}
+	}
 }
 
-void	ft_cd(char *input)
+void	ft_cd(char **input)
 {
-	printf("%s TO CODE\n", input);
+	printf("%s TO CODE\n", input[0]);
 }
 
-void	ft_pwd(char *input)
+void	ft_pwd(char **input)
 {
 	char	cwd[PATH_MAX];
 
-	(void) input;
+	if (input[1] && input[1][0] == '-' && input[1][1] != ' ')
+	{
+		printf("minishell: pwd: -%c invalid option\n", input[1][1]);
+		return ;
+	}
     if (getcwd(cwd, sizeof(cwd)) != NULL)
-        printf("(builtin)%s\n", cwd);
+        printf("(builtin)%s\n", cwd);//'(builtin)' a supprimer
 	else
         printf("getcwd() error");
 }
 
-void	ft_export(char *input)
+void	ft_export(char **input)
 {
-	printf("%s TO CODE\n", input);
+	printf("%s TO CODE\n", input[0]);
 }
 
-void	ft_unset(char *input)
+void	ft_unset(char **input)
 {
-	printf("%s TO CODE\n", input);
+	printf("%s TO CODE\n", input[0]);
 }
 
-void	ft_env(char *input)
+void	ft_env(char **input)
 {
-	printf("%s TO CODE\n", input);
+	printf("%s TO CODE\n", input[0]);
 }
 
-void	ft_exit(char *input)
+void	ft_exit(char **input)
 {
-	printf("%s TO CODE\n", input);
+	printf("%s TO CODE\n", input[0]);
 }
 
 void	exec_builtin(char *input)
 {
-	if (!ft_strncmp(input, "echo", 4))
-		ft_echo(input + 5);//ce qui vient après 'echo ' est envoyé
-	else if (!ft_strncmp(input, "cd", 2))
-		ft_cd(input);
-	else if (!ft_strncmp(input, "pwd", 3))
-		ft_pwd(input);
-	else if (!ft_strncmp(input, "export", 6))
-		ft_export(input);
-	else if (!ft_strncmp(input, "unset", 5))
-		ft_unset(input);
-	else if (!ft_strncmp(input, "env", 3))
-		ft_env(input);
-	else if (!ft_strncmp(input, "exit", 4))
-		ft_exit(input);
+	char	**tab;
+
+	tab = ft_split(input, ' ');
+	if (!ft_strcmp(tab[0], "echo"))
+		ft_echo(tab);
+	else if (!ft_strcmp(tab[0], "cd"))
+		ft_cd(tab);
+	else if (!ft_strcmp(tab[0], "pwd"))
+		ft_pwd(tab);
+	else if (!ft_strcmp(tab[0], "export"))
+		ft_export(tab);
+	else if (!ft_strcmp(tab[0], "unset"))
+		ft_unset(tab);
+	else if (!ft_strcmp(tab[0], "env"))
+		ft_env(tab);
+	else if (!ft_strcmp(tab[0], "exit"))
+		ft_exit(tab);
 	else
 		printf("error, builtin not executed\n");
+	free_tab(tab);
 }
 
 bool	is_builtin(char *input)

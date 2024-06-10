@@ -4,7 +4,7 @@ CC =		cc
 
 FLAGS =		-Wall -Werror -Wextra
 
-SRC = 		main.c exec_ext.c builtins.c
+SRC = 		main.c exec_ext.c builtins.c utils_tab.c
 
 OBJ = ${SRC:.c=.o}
 

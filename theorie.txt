@@ -95,8 +95,6 @@ comme input de la commande à gauche
 
 
 
-
-
 Tokenisation bash? (chatgpt)
 (Ce qui n'est pas demandé dans le sujet n'est pas noté)
 
@@ -129,3 +127,20 @@ la manière dont les tokens sont groupés et exécutés.
 6. Après la tokenisation, le shell effectue une analyse syntaxique pour
 comprendre la structure de la commande. Il identifie les commandes, les
 arguments, les redirections, les sous-commandes, etc.
+
+
+SCHEMA pipe
+
+Processus parent (Bash)
+  |
+  |-- pipe() --> crée [descripteur de lecture, descripteur d'écriture]
+  |
+  |-- fork() --> Processus enfant 1 (ls -l)
+  |              |-- dup2(descripteur d'écriture, stdout) --> redirige stdout vers le pipe
+  |              |-- close(descripteur de lecture) --> ferme l'extrémité de lecture dans ce processus
+  |              |-- exec(ls -l) --> exécute la commande ls -l
+  |
+  |-- fork() --> Processus enfant 2 (grep "txt")
+                 |-- dup2(descripteur de lecture, stdin) --> redirige stdin vers le pipe
+                 |-- close(descripteur d'écriture) --> ferme l'extrémité d'écriture dans ce processus
+                 |-- exec(grep "txt") --> exécute la commande grep "txt"

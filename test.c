@@ -1,9 +1,11 @@
 
 #include "minishell.h"
 
-int main(void)
+int main(int argc, char **argv, char **env)
 {
-	char *str = "echo ";
-	printf("%zu\n", ft_strlen(str));
+	(void)argc;
+	(void)argv;
+	printf("%s\n", env[0]);
+
 	return (0);
 }

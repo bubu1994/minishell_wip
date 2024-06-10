@@ -12,17 +12,6 @@
 
 #include "minishell.h"
 
-
-void	free_tab(char **tab)
-{
-	int	i;
-
-	i = -1;
-	while (tab[++i])
-		free(tab[i]);
-	free(tab);
-}
-
 char	*join_path_slash_input(char *path_rep, char *input)
 {
 	char	*res;
@@ -37,8 +26,6 @@ char	*join_path_slash_input(char *path_rep, char *input)
 /*
 -input peut comprendre les options (ex. input = ls -l -a)
 -n'interpréte pas les guillemets
--si commande executée, leaks ?? La pile et le tas seraient écrasés
--segfault avec des espaces au debut
 */
 void	execute_external_command(const char *input)
 {

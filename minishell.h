@@ -31,12 +31,14 @@
 //builtins
 bool	is_builtin(char *input);
 void	exec_builtin(char *input);
-void	ft_echo(char *input);
+void	ft_echo(char **input);
 
 //exec_ext
 void	execute_external_command(const char *input);
 
 //utils
 void	free_tab(char **tab);
+int size_of_tab(char **tab);
+
 
 #endif
