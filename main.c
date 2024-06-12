@@ -37,12 +37,9 @@ void	exe_command(char *input)
 void	parsing(char *input)//input du prompt, de l'user
 {
 	char	**tab;
-	int		i;
 
-	i = 0;
 	tab = ft_split(input, '|');
 	
-	exe_command(tab[0]);
 	free_tab(tab);
 }
 /*PIPE
@@ -57,6 +54,7 @@ Le processus de la première commande (ls -l) écrit sa sortie dans le pipe, et 
 processus de la deuxième commande (grep "txt") lit cette entrée depuis le pipe.
 LE PIPE EST UN CANAL DE COMMUNICATION ENTRE DEUX PROCESSUS. Un canal a une entrée
 et une sortie! lol
+CODER: 
 */
 
 int	main(void)
